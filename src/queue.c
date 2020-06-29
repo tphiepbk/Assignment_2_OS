@@ -2,47 +2,42 @@
 #include <stdlib.h>
 #include "queue.h"
 
-int empty(struct queue_t * q) {
+int empty(struct queue_t *q)
+{
 	return (q->size == 0);
 }
 
-void enqueue(struct queue_t * q, struct pcb_t * proc) {
-	if(empty(q)){
-		q -> proc[0] = (struct pcb_t *)malloc(sizeof(struct pcb_t));
-		q -> proc[0] = proc ;
-		q -> size +=1 ;
-	}
-	else if(q -> size < 10){
-		q -> proc[q->size] = (struct pcb_t *)malloc(sizeof(struct pcb_t));
-		q -> proc[q->size] = proc ;
-		q -> size +=1 ;
-		
-	}
-		
-	/* TODO: put a new process to queue [q] */	
+void enqueue(struct queue_t *q, struct pcb_t *proc)
+{
+	/* TODO: put a new process to queue [q] */
+	if (q->size == MAX_QUEUE_SIZE) return;
+	q->proc[q->size] = proc;
+	q->size++;
 }
 
-struct pcb_t * dequeue(struct queue_t * q) {
+struct pcb_t *dequeue(struct queue_t *q)
+{
 	/* TODO: return a pcb whose prioprity is the highest
 	 * in the queue [q] and remember to remove it from q
 	 * */
-	struct pcb_t * proc_t ;
-	int kt = 0; 
-	if(empty(q)){
-		return NULL;
-	}
-	else {
-		
-		proc_t = q -> proc[0];
-		for(int i = 1 ; i < q -> size ; i++){
-			if(q -> proc[i] -> priority > proc_t -> priority){
-				proc_t = q -> proc[i];
-				kt = i;
-			}
+	if (q->size == 0) return NULL;
+	int sizeOfQueue = q->size;
+	struct pcb_t *proc_priority = q->proc[0];
+	int ind_priority = 0;
+	for (int counter = 1; counter < sizeOfQueue; counter ++)
+	{
+		if (q->proc[counter]->priority > proc_priority->priority)
+		{
+			proc_priority = q->proc[counter];
+			ind_priority = counter;
 		}
-		q -> size -= 1 ;
-		q -> proc[kt] = q -> proc[q->size];
-		return proc_t;
 	}
+	for (; ind_priority < sizeOfQueue - 1; ind_priority++)
+	{
+		q->proc[ind_priority] = q->proc[ind_priority + 1];
+		
+	}
+	q->proc[ind_priority] = NULL;
+	q->size--;
+	return proc_priority;
 }
-
